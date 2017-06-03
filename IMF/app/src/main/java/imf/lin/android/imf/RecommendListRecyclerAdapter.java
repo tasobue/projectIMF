@@ -98,6 +98,11 @@ public class RecommendListRecyclerAdapter extends RecyclerView.Adapter<Recommend
         notifyItemMoved(fromPosition, toPosition);
     }
 
+    //テキストを取得する
+    public CharSequence getText(int position){
+        return dataset.get(position);
+    }
+
     //************************************************************************************
     // コールバック用のリスナー
     private RecommendListRecyclerAdapter.OnButtonClickListener mListener;

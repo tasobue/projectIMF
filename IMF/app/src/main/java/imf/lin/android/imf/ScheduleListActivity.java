@@ -20,6 +20,8 @@ public class ScheduleListActivity extends AppCompatActivity implements SearchLis
     private SearchListFragment _searchListFragment;
     private int backPosition;
 
+    private LocationFragment mLocationFragment;
+
     //************************************************************************************
     //Listener Event
     @Override
@@ -35,15 +37,28 @@ public class ScheduleListActivity extends AppCompatActivity implements SearchLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //set XML Layout at first
+        //*********Main Layout
         setContentView(R.layout.layout_schedule_list);
 
+        //*********LocationFragment
+        mLocationFragment = (LocationFragment) getSupportFragmentManager().findFragmentByTag(LocationFragment.TAG);
+        if (mLocationFragment == null) {
+            mLocationFragment = mLocationFragment.newInstance();
+            getSupportFragmentManager().beginTransaction()
+                    .add(mLocationFragment, LocationFragment.TAG)
+                    .commit();
+        }
+
+        //*********SlidinPanLayOut***********
         mSlidingLayout = (SlidingPaneLayout) findViewById(R.id.sliding_layout);
+
 
         // スライドアウトしたペインのフェードに使う色をセット
         mSlidingLayout.setSliderFadeColor(Color.TRANSPARENT);
 
         mSlidingLayout.openPane();
+
+        //*********RecyclerView************
         setRecyclerView();
 
     }
@@ -77,9 +92,9 @@ public class ScheduleListActivity extends AppCompatActivity implements SearchLis
 
                     mSlidingLayout.closePane();
 
-                    String cond = "稲沢市";
+                    String cond = adapter.getText(backPosition);
 
-                    android.app.Fragment f = SearchListFragment.getInstance(cond);
+                    android.app.Fragment f = SearchListFragment.getInstance(cond, mLocationFragment.getdblLat(), mLocationFragment.getdblLong());
 
                     getFragmentManager().beginTransaction().replace(R.id.content_container, f)
                             .commit();
@@ -93,24 +108,6 @@ public class ScheduleListActivity extends AppCompatActivity implements SearchLis
     public static Intent createIntent(Context context) {
         return new Intent(context, ScheduleListActivity.class);
     }
-
-    //******************************************************************************
-//    public interface OnItemSelectedListener {
-//        public void onItemSelected();
-//    }
-//
-//    private OnItemSelectedListener _listener;
-//
-//    public void setListener(OnItemSelectedListener listener){
-//        _listener = listener;
-//    }
-//
-//    public void method(){
-//        setContentView(R.layout.layout_schedule_list);
-//        mSlidingLayout = (SlidingPaneLayout) findViewById(R.id.sliding_layout);
-//        mSlidingLayout.openPane();
-//    }
-    //******************************************************************************
 
 
 }

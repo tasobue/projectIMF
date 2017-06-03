@@ -12,7 +12,7 @@ public class DummyDataGenerator {
         ArrayList<String> list = new ArrayList<>();
         list.add("ジョギング");
         list.add("ショッピング");
-        list.add("映画");
+        list.add("ローソン");
         list.add("釣り");
         list.add("キャンプ");
         list.add("デート");

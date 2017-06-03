@@ -36,9 +36,13 @@ import com.google.android.gms.maps.model.LatLngBounds;
 
 import java.util.ArrayList;
 
-import static com.google.android.gms.location.places.AutocompleteFilter.TYPE_FILTER_ESTABLISHMENT;
+import static com.google.android.gms.location.places.AutocompleteFilter.TYPE_FILTER_NONE;
 
 public class SearchListFragment extends Fragment implements OnConnectionFailedListener,ConnectionCallbacks {
+    public static final String KEY_WORD = "keyword";
+    public static final String LAT = "latitude";
+    public static final String LONG = "longitude";
+    private SearchListFragment f;
     private RecyclerView recyclerView;
     private RecommendListRecyclerAdapter adapter;
     private GoogleApiClient mGoogleApiClient;
@@ -46,14 +50,18 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
     ArrayList<CharSequence> resultsArray = new ArrayList<>();
     View mFlagmentView;
 
+
+
     private View _view;
 
     ScheduleListActivity _scheduleListActivity;
 
-    static public SearchListFragment getInstance(String cond) {
+    static public SearchListFragment getInstance(String strKeyWord, double dblLang, double dblLat) {
         SearchListFragment f = new SearchListFragment();
         Bundle args = new Bundle();
-        args.putString("cond", cond);
+        args.putString(KEY_WORD, strKeyWord);
+        args.putDouble(LAT, dblLang);
+        args.putDouble(LONG, dblLat);
         f.setArguments(args);
 
         return f;
@@ -63,13 +71,17 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mGoogleApiClient = new GoogleApiClient
-                .Builder(getActivity())
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .addConnectionCallbacks(this)
-                .enableAutoManage((FragmentActivity) getActivity(), this)
-                .build();
+        //プレイス検索
+        if(mGoogleApiClient == null){
+            mGoogleApiClient = new GoogleApiClient
+                    .Builder(getActivity())
+                    .addApi(Places.GEO_DATA_API)
+                    .addApi(Places.PLACE_DETECTION_API)
+                    .addConnectionCallbacks(this)
+                    .enableAutoManage((FragmentActivity) getActivity(), this)
+                    .build();
+        }
+
         mGoogleApiClient.connect();
 
     }
@@ -84,8 +96,6 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        //Crowring Internet
-        String cond = getArguments().getString("cond");
     }
 
     //接続成功
@@ -107,6 +117,7 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
         // the failure silently  
         // ... 
     }
+
     // 位置情報許可の確認
     public void checkPermission() {
         // 既に許可している
@@ -160,15 +171,17 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
                 if (getActivity().checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                         || getActivity().checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     //API 実行できるかテスト　Start
-                    double lat = 35.170;
-                    double lng = 137.00;
+                    double lat = getArguments().getDouble(LAT);
+                    double lng = getArguments().getDouble(LONG);
+                    String keyword = getArguments().getString(KEY_WORD);
 
-                    LatLngBounds bounds = new LatLngBounds.Builder().include(new LatLng(lat, lng)).build();
+//                    LatLngBounds bounds = new LatLngBounds.Builder().include(new LatLng(lat, lng)).build();
+                    LatLngBounds bounds = new LatLngBounds(new LatLng(lat, lng),new LatLng(lat + 1, lng + 1));
                     PendingResult<AutocompletePredictionBuffer> result = Places.GeoDataApi.getAutocompletePredictions(
                             mGoogleApiClient,
-                            "コンビニ",
+                            keyword,
                             bounds,
-                            new AutocompleteFilter.Builder().setTypeFilter(TYPE_FILTER_ESTABLISHMENT).build());
+                            new AutocompleteFilter.Builder().setTypeFilter(TYPE_FILTER_NONE).build());
 
                         result.setResultCallback(new ResultCallback<AutocompletePredictionBuffer>() {
                         @Override
@@ -178,7 +191,7 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
                                 AutocompletePrediction predict = autocompletePredictions.get(i);
                                 String placeid = predict.getPlaceId();
                                 Log.d("MyApp placeId", placeid);
-                                CharSequence fulltxt = predict.getFullText(new CharacterStyle() {
+                                CharSequence fulltxt = predict.getPrimaryText(new CharacterStyle() {
                                     @Override
                                     public void updateDrawState(TextPaint textPaint) {
 
@@ -224,18 +237,16 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
                     adapter.removeAtPosition(viewHolder.getAdapterPosition());
                 }
                 if(direction == ItemTouchHelper.LEFT){
-                    //************************************************************************************
                     if (mListener != null) {
-                        mListener.onClickButton("result");
+                        Log.d("MyApp returnText",adapter.getText(viewHolder.getAdapterPosition()).toString());
+                        mListener.onClickButton(adapter.getText(viewHolder.getAdapterPosition()).toString());
                     }
-                    //************************************************************************************
                 }
             }
         }).attachToRecyclerView(recyclerView);
 
     }
 
-    //************************************************************************************
     public interface MyListener {
         public void onClickButton(String text);
     }
@@ -261,6 +272,7 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
         super.onDetach();
         // 画面からFragmentが離れたあとに処理が呼ばれることを避けるためにNullで初期化しておく
         mListener = null;
+        mGoogleApiClient.stopAutoManage((FragmentActivity)getActivity());
+        mGoogleApiClient.disconnect();
     }
-    //************************************************************************************
 }

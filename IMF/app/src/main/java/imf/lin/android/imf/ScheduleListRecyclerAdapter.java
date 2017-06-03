@@ -1,6 +1,5 @@
 package imf.lin.android.imf;
 
-import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -101,5 +100,10 @@ public class ScheduleListRecyclerAdapter extends RecyclerView.Adapter<ScheduleLi
     public void openPane(int fromPosition, int toPosition) {
 
     }
+
+    //テキストを取得する
+     public String getText(int position){
+         return dataset.get(position);
+     }
 
 }
