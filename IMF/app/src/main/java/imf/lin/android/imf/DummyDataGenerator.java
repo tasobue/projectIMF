@@ -39,32 +39,41 @@ public class DummyDataGenerator {
         list.add("ジム");
         list.add("ボーリング");
         list.add("ダーツ");
-        list.add("");
-        list.add("シンメンタール種");
-        list.add("スウェーデンレッドアンドホワイト種");
-        list.add("デキスター種");
-        list.add("デボン種");
-        list.add("デーリィショートホーン種");
-        list.add("ノルウェーレッド種");
-        list.add("ノルマン種");
-        list.add("ハイランド種");
-        list.add("パイルージュフランドル種");
-        list.add("ピンツガウエル種");
-        list.add("フィンランド種");
-        list.add("ブラウンスイス種");
-        list.add("ヘレフォード種");
-        list.add("ホルスタイン種");
-        list.add("マレーグレー種");
-        list.add("マルキジアーナ種");
-        list.add("ミューズラインイーセル種");
-        list.add("ムーザン種");
-        list.add("モンベリエール種");
-        list.add("リンカーンレッド種");
-        list.add("レッドデーニッシュ種");
-        list.add("レッドポール種");
-        list.add("ロートフィー種");
-        list.add("ロマニョーラ種");
-        list.add("ホワイトベルテッドギャラウェイ種");
+        return list;
+    }
+
+
+    public static List<String> generateTimeList() {
+        ArrayList<String> list = new ArrayList<>();
+        list.add("06:00");
+        list.add("07:00");
+        list.add("08:00");
+        list.add("09:00");
+        list.add("10:00");
+        list.add("11:00");
+        list.add("12:00");
+        list.add("13:00");
+        list.add("14:00");
+        list.add("15:00");
+        list.add("16:00");
+        list.add("17:00");
+        list.add("18:00");
+        list.add("19:00");
+        list.add("20:00");
+        list.add("21:00");
+        list.add("22:00");
+        list.add("23:00");
+        list.add("24:00");
+        list.add("24:00");
+        list.add("24:00");
+        list.add("24:00");
+        list.add("24:00");
+        list.add("24:00");
+        list.add("24:00");
+        list.add("24:00");
+        list.add("24:00");
+        list.add("24:00");
+        list.add("24:00");
         return list;
     }
 

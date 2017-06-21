@@ -4,6 +4,7 @@ package imf.lin.android.imf;
  * Created by stmac0001 on 2017/04/05.
  */
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -129,6 +130,8 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
             else {
                 requestLocationPermission();
             }
+        }else{
+            execStart();
         }
     }
 
@@ -170,12 +173,11 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
             if (Build.VERSION.SDK_INT >= 23) {
                 if (getActivity().checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                         || getActivity().checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    //API 実行できるかテスト　Start
+
                     double lat = getArguments().getDouble(LAT);
                     double lng = getArguments().getDouble(LONG);
                     String keyword = getArguments().getString(KEY_WORD);
 
-//                    LatLngBounds bounds = new LatLngBounds.Builder().include(new LatLng(lat, lng)).build();
                     LatLngBounds bounds = new LatLngBounds(new LatLng(lat, lng),new LatLng(lat + 1, lng + 1));
                     PendingResult<AutocompletePredictionBuffer> result = Places.GeoDataApi.getAutocompletePredictions(
                             mGoogleApiClient,
@@ -206,10 +208,43 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
                             setRecyclerView();
                         }
                     });
-                    //API 実行できるかテスト　End
                 }
             } else {
                 //SDKのバージョンは２３以上なので何もしない。
+                double lat = getArguments().getDouble(LAT);
+                double lng = getArguments().getDouble(LONG);
+                String keyword = getArguments().getString(KEY_WORD);
+
+                LatLngBounds bounds = new LatLngBounds(new LatLng(lat, lng),new LatLng(lat + 1, lng + 1));
+                PendingResult<AutocompletePredictionBuffer> result = Places.GeoDataApi.getAutocompletePredictions(
+                        mGoogleApiClient,
+                        keyword,
+                        bounds,
+                        new AutocompleteFilter.Builder().setTypeFilter(TYPE_FILTER_NONE).build());
+
+                result.setResultCallback(new ResultCallback<AutocompletePredictionBuffer>() {
+                    @Override
+                    public void onResult(@NonNull AutocompletePredictionBuffer autocompletePredictions) {
+                        Log.d("MyApp ACcount", Integer.toString(autocompletePredictions.getCount()) );
+                        for (int i = 0; i < autocompletePredictions.getCount(); i++) {
+                            AutocompletePrediction predict = autocompletePredictions.get(i);
+                            String placeid = predict.getPlaceId();
+                            Log.d("MyApp placeId", placeid);
+                            CharSequence fulltxt = predict.getPrimaryText(new CharacterStyle() {
+                                @Override
+                                public void updateDrawState(TextPaint textPaint) {
+
+                                }
+                            });
+                            Log.d("MyApp fulltxt", fulltxt.toString());
+                            SearchListFragment.this.resultsArray.add(fulltxt);
+                            Log.d("MyApp size", Integer.toString(SearchListFragment.this.resultsArray.size()));
+                        }
+                        autocompletePredictions.release();
+                        //リサイクラービューの設定
+                        setRecyclerView();
+                    }
+                });
             }
     }
 
@@ -247,12 +282,12 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
 
     }
 
+    // 変数を用意する
+    private MyListener mListener;
+
     public interface MyListener {
         public void onClickButton(String text);
     }
-
-    // 変数を用意する
-    private MyListener mListener;
 
     // FragmentがActivityに追加されたら呼ばれるメソッド
     @Override
@@ -262,17 +297,34 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
         // contextクラスがMyListenerを実装しているかをチェックする
         if (context instanceof MyListener) {
             // リスナーをここでセットするようにします
-            mListener = (MyListener) context;
+            onAttachContext(context);
         }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) return;
+        onAttachContext(activity);
+    }
+
+    private void onAttachContext(Context context) {
+        // 処理
+        mListener = (MyListener) context;
     }
 
     // FragmentがActivityから離れたら呼ばれるメソッド
     @Override
     public void onDetach() {
         super.onDetach();
+        onDetachContext();
+    }
+
+    private void onDetachContext() {
+        // 処理
         // 画面からFragmentが離れたあとに処理が呼ばれることを避けるためにNullで初期化しておく
         mListener = null;
-        mGoogleApiClient.stopAutoManage((FragmentActivity)getActivity());
+        mGoogleApiClient.stopAutoManage((FragmentActivity) getActivity());
         mGoogleApiClient.disconnect();
     }
 }

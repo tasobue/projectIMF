@@ -9,11 +9,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
+import static imf.lin.android.imf.TimePickerDialogFragment.getNewInstance;
+
 /**
  * Created by stmac0001 on 2017/03/26.
  */
 
-public class ScheduleListActivity extends AppCompatActivity implements SearchListFragment.MyListener{
+public class ScheduleListActivity extends AppCompatActivity
+        implements  SearchListFragment.MyListener,
+                    ScheduleListRecyclerAdapter.OnItemClickListener,
+                    TimePickerDialogFragment.OnScheduleTimeSetListener{
     private RecyclerView recyclerView;
     private ScheduleListRecyclerAdapter adapter;
     private SlidingPaneLayout mSlidingLayout;
@@ -30,6 +35,18 @@ public class ScheduleListActivity extends AppCompatActivity implements SearchLis
         adapter.addAtPosition(backPosition, text);
         adapter.removeAtPosition(backPosition +1 );
     }
+
+    @Override
+    public void onItemClick(ScheduleListRecyclerAdapter adapter, int position){
+        TimePickerDialogFragment timePicker = getNewInstance(position);
+        timePicker.setOnScheduleTimeSetListener(this);
+        timePicker.show(getSupportFragmentManager(), "timePicker");
+    }
+
+    @Override
+    public void onScheduleTimeSet(int position, int hourOfDay, int minute){
+        adapter.setTime(position, String.valueOf(hourOfDay) + ":" + String.valueOf(minute));
+    };
     //************************************************************************************
 
 
@@ -68,7 +85,8 @@ public class ScheduleListActivity extends AppCompatActivity implements SearchLis
         recyclerView.setHasFixedSize(true);
 
         //setAdapter
-        adapter = new ScheduleListRecyclerAdapter(DummyDataGenerator.generateStringListData());
+        adapter = new ScheduleListRecyclerAdapter(DummyDataGenerator.generateStringListData(), DummyDataGenerator.generateTimeList());
+        adapter.setOnItemClickListener(this);
 
         recyclerView.setAdapter(adapter);
 
@@ -85,7 +103,7 @@ public class ScheduleListActivity extends AppCompatActivity implements SearchLis
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 if(direction == ItemTouchHelper.RIGHT){
                     // アイテム右スワイプ時
-                    adapter.removeAtPosition(viewHolder.getAdapterPosition());
+                    adapter.changeAtPosition(viewHolder.getAdapterPosition());
                 }
                 if(direction == ItemTouchHelper.LEFT){
                     backPosition  = viewHolder.getAdapterPosition();

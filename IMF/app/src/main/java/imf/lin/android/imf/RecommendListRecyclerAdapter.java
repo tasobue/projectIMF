@@ -103,24 +103,24 @@ public class RecommendListRecyclerAdapter extends RecyclerView.Adapter<Recommend
         return dataset.get(position);
     }
 
-    //************************************************************************************
-    // コールバック用のリスナー
-    private RecommendListRecyclerAdapter.OnButtonClickListener mListener;
-
-    /*
-     * コールバックの定義
-     */
-    public interface OnButtonClickListener {
-        // クリック処理
-        public void onClick(int position);
-    }
-
-    /*
-     * コールバックの設定
-     */
-    public void setOnButtonClickListener(RecommendListRecyclerAdapter.OnButtonClickListener listener) {
-        mListener = listener;
-    }
-    //************************************************************************************
+//    //************************************************************************************
+//    // コールバック用のリスナー
+//    private RecommendListRecyclerAdapter.OnButtonClickListener mListener;
+//
+//    /*
+//     * コールバックの定義
+//     */
+//    public interface OnButtonClickListener {
+//        // クリック処理
+//        public void onClick(int position);
+//    }
+//
+//    /*
+//     * コールバックの設定
+//     */
+//    public void setOnButtonClickListener(RecommendListRecyclerAdapter.OnButtonClickListener listener) {
+//        mListener = listener;
+//    }
+//    //************************************************************************************
 
 }
