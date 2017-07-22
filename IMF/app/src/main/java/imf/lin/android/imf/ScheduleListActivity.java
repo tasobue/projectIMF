@@ -34,6 +34,8 @@ public class ScheduleListActivity extends AppCompatActivity
         mSlidingLayout.openPane();
         adapter.addAtPosition(backPosition, text);
         adapter.removeAtPosition(backPosition +1 );
+
+        setTitle("今日のスケジュール");
     }
 
     @Override
@@ -53,6 +55,7 @@ public class ScheduleListActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle("今日のスケジュール");
 
         //*********Main Layout
         setContentView(R.layout.layout_schedule_list);
@@ -106,6 +109,8 @@ public class ScheduleListActivity extends AppCompatActivity
                     adapter.changeAtPosition(viewHolder.getAdapterPosition());
                 }
                 if(direction == ItemTouchHelper.LEFT){
+
+                    setTitle("行きたい場所を選ぼう");
                     backPosition  = viewHolder.getAdapterPosition();
 
                     mSlidingLayout.closePane();

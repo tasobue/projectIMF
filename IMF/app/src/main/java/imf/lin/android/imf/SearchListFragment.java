@@ -48,7 +48,8 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
     private RecommendListRecyclerAdapter adapter;
     private GoogleApiClient mGoogleApiClient;
     private final int REQUEST_PERMISSION = 1000;
-    ArrayList<CharSequence> resultsArray = new ArrayList<>();
+    ArrayList<CharSequence> titlesArray = new ArrayList<>();
+    ArrayList<CharSequence> detailsArray = new ArrayList<>();
     View mFlagmentView;
 
 
@@ -193,15 +194,24 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
                                 AutocompletePrediction predict = autocompletePredictions.get(i);
                                 String placeid = predict.getPlaceId();
                                 Log.d("MyApp placeId", placeid);
-                                CharSequence fulltxt = predict.getPrimaryText(new CharacterStyle() {
+                                CharSequence primarytxt = predict.getPrimaryText(new CharacterStyle() {
                                     @Override
                                     public void updateDrawState(TextPaint textPaint) {
 
                                     }
                                 });
-                                Log.d("MyApp fulltxt", fulltxt.toString());
-                                SearchListFragment.this.resultsArray.add(fulltxt);
-                                Log.d("MyApp size", Integer.toString(SearchListFragment.this.resultsArray.size()));
+                                CharSequence secondtxt = predict.getSecondaryText(new CharacterStyle() {
+                                      @Override
+                                      public void updateDrawState(TextPaint textPaint) {
+
+                                      }
+                                  }
+                                );
+                                Log.d("MyApp primarytxt", primarytxt.toString());
+                                Log.d("MyApp secondtxt", secondtxt.toString());
+                                titlesArray.add(primarytxt);
+                                detailsArray.add(secondtxt);
+                                Log.d("MyApp size", Integer.toString(titlesArray.size()));
                             }
                             autocompletePredictions.release();
                             //リサイクラービューの設定
@@ -210,7 +220,7 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
                     });
                 }
             } else {
-                //SDKのバージョンは２３以上なので何もしない。
+                //SDKのバージョンは２３以上。
                 double lat = getArguments().getDouble(LAT);
                 double lng = getArguments().getDouble(LONG);
                 String keyword = getArguments().getString(KEY_WORD);
@@ -230,15 +240,24 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
                             AutocompletePrediction predict = autocompletePredictions.get(i);
                             String placeid = predict.getPlaceId();
                             Log.d("MyApp placeId", placeid);
-                            CharSequence fulltxt = predict.getPrimaryText(new CharacterStyle() {
+                            CharSequence primarytxt = predict.getPrimaryText(new CharacterStyle() {
                                 @Override
                                 public void updateDrawState(TextPaint textPaint) {
 
                                 }
                             });
-                            Log.d("MyApp fulltxt", fulltxt.toString());
-                            SearchListFragment.this.resultsArray.add(fulltxt);
-                            Log.d("MyApp size", Integer.toString(SearchListFragment.this.resultsArray.size()));
+                            CharSequence secondtxt = predict.getSecondaryText(new CharacterStyle() {
+                                @Override
+                                public void updateDrawState(TextPaint textPaint) {
+
+                                }
+                            }
+                            );
+                            Log.d("MyApp primarytxt", primarytxt.toString());
+                            Log.d("MyApp secondtxt", secondtxt.toString());
+                            titlesArray.add(primarytxt);
+                            detailsArray.add(secondtxt);
+                            Log.d("MyApp size", Integer.toString(titlesArray.size()));
                         }
                         autocompletePredictions.release();
                         //リサイクラービューの設定
@@ -253,7 +272,7 @@ public class SearchListFragment extends Fragment implements OnConnectionFailedLi
         recyclerView.setHasFixedSize(true);
 
         //setAdapter
-        adapter = new RecommendListRecyclerAdapter(resultsArray);
+        adapter = new RecommendListRecyclerAdapter(titlesArray, detailsArray);
         recyclerView.setAdapter(adapter);
 
         //implement ItemTouchHelper to swipe and Drug&Drop

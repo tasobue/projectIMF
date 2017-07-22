@@ -40,7 +40,7 @@
                     android:layout_below="@id/manipulation_title_text_view"
                     android:layout_margin="8dp"
                     android:layout_toLeftOf="@id/manipulation_execute_button"
-                    android:text="稲沢の寂しがりな女性を探して見よう"
+                    android:text="今日ひま？外へ出かける予定を立てよう"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
                 <Button
@@ -49,7 +49,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:text="実行" />
+                    android:text="スタート" />
             </RelativeLayout>
         </android.support.v7.widget.CardView>
     </LinearLayout>
